@@ -3,7 +3,9 @@ angular.module('thymer', [
   'thymer.home',
   'thymer.newRecipe',
   'thymer.searchRecipes',
-  'ngRoute'
+  'thymer.viewRecipe',
+  'ngRoute',
+  'angularUtils.directives.dirPagination'
 ])
 
 // this first step is needed to redirect on page reloads within the cooking tab
@@ -11,29 +13,6 @@ angular.module('thymer', [
   console.dir($location);
   if ($location.$$path === '/cooking')
   $location.path('/searchRecipes');
-})
-
-.config(function($routeProvider) {
-  $routeProvider
-  .when('/', {
-    templateUrl: 'partials/home/home.html',
-    controller: 'homeController'
-  })
-  .when('/cooking', {
-    templateUrl: 'partials/cooking/cooking.html',
-    controller: 'cookingController'
-  })
-  .when('/newRecipe', {
-    templateUrl: 'partials/newRecipe/newRecipe.html',
-    controller: 'newRecipeController'
-  })
-  .when('/searchRecipes', {
-    templateUrl: 'partials/searchRecipes/searchRecipes.html',
-    controller: 'searchRecipesController'
-  })
-  .otherwise({
-    redirectTo: '/'
-  });
 })
 
 .factory('Recipes', function($http) {
@@ -46,6 +25,7 @@ angular.module('thymer', [
       method: 'GET',
       url: '/api/recipes'
     }).then(function(res) {
+      console.log('Recipes: ', res.data);
       return res.data;
     });
   };
@@ -57,6 +37,17 @@ angular.module('thymer', [
       method: 'POST',
       url: '/api/recipes',
       data: recipe
+    });
+  };
+
+  // get request to get a specific recipe by id
+  var getRecipeById = function(id) {
+    return $http ({
+      method: 'GET',
+      url: '/api/recipe/' + id
+    }).then(function(res) {
+      console.log('getRecipeById res.data: ', res.data);
+      return res.data;
     });
   };
 
@@ -88,6 +79,7 @@ angular.module('thymer', [
     getRecipes: getRecipes,
     setCurrentRecipe: setCurrentRecipe,
     getCurrentRecipe: getCurrentRecipe,
+    getRecipeById: getRecipeById,
     visible: visible
   };
 });
